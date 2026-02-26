@@ -8,6 +8,7 @@ RUN bun build --compile --minify src/index.ts --outfile server
 FROM debian:bookworm-slim
 WORKDIR /app
 COPY --from=build /app/server server
+COPY --from=build /app/drizzle drizzle
 
 ENV NODE_ENV=production
 EXPOSE 3000
