@@ -9,14 +9,10 @@ const { positionals } = parseArgs({
 
 const command = positionals[0];
 
-switch (command) {
-  case "migrate": {
-    const { runMigrations } = await import("./db/migrate.ts");
-    runMigrations();
-    process.exit(0);
-  }
-
-  default: {
+if (command === 'migrate') {
+    const {runMigrations} = await import('./db/migrate.ts')
+    runMigrations()
+    process.exit(0)
+} else {
     runServer()
-  }
 }

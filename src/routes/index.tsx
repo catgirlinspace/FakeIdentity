@@ -1,11 +1,17 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { APITester } from "./APITester";
-import "./index.css";
+import { createRoute } from '@tanstack/react-router'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { APITester } from '@/components/APITester'
+import { rootRoute } from './__root'
+import logo from '../logo.svg'
+import reactLogo from '../react.svg'
 
-import logo from "./logo.svg";
-import reactLogo from "./react.svg";
+export const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: HomePage,
+})
 
-export function App() {
+function HomePage() {
   return (
     <div className="container mx-auto p-8 text-center relative z-10">
       <div className="flex justify-center items-center gap-8 mb-8">
@@ -33,7 +39,5 @@ export function App() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
-
-export default App;
