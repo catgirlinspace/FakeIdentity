@@ -26,7 +26,6 @@ function CasLogin() {
 	const [err, setErr] = useState<string | null>(null)
 
 	const onSelectedAccount = (account: Account) => {
-		console.log("Selected account:", account)
 		api.cas.authenticate
 			.post({
 				service,
