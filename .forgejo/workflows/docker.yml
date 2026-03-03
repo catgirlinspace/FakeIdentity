@@ -8,6 +8,11 @@ jobs:
   build:
     runs-on: node-22
     steps:
+      - name: Install Docker CLI
+        run: |
+          apt-get update
+          apt-get install -y docker.io
+
       - uses: actions/checkout@v4
 
       - uses: docker/setup-buildx-action@v3
