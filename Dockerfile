@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-ENV DB_PATH=/data/fakeidentity.db
+ENV DB_PATH=/tmp/build.db
 
 COPY . .
 RUN bun --bun run build
