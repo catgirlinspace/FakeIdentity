@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+@import '@nas-szpunar/colors';
+
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
