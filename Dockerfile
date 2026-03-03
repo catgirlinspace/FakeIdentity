@@ -6,6 +6,7 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY . .
+ENV DB_PATH=/data/fakeidentity.db
 RUN bun --bun run build
 
 FROM oven/bun:1-slim
