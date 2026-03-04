@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {enhance} from '$app/forms'
-	import {Loader} from 'lucide-svelte'
+	import {LoaderCircle} from 'lucide-svelte'
 
 	let {data, form} = $props()
 	let canSelect = $state(true)
@@ -52,7 +52,7 @@
                             disabled={!canSelect}
                     >
                         {#if loadingAccountId === account.id}
-                            <Loader />
+                            <LoaderCircle class="animate-spin mx-auto" />
                         {:else}
                             Select
                         {/if}
