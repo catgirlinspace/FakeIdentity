@@ -14,7 +14,7 @@ FROM oven/bun:1-slim
 
 WORKDIR /app
 
-COPY --from=build /app/build ./build
+COPY --from=build /app ./
 
 ENV NODE_ENV=production
 ENV PORT=3000
