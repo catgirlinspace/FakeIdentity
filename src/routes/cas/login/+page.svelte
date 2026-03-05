@@ -31,7 +31,7 @@
         <div class="bg-nas-purple-100 border border-nas-purple p-4">
             <h2 class="text-xl font-semibold">{account.name}</h2>
             <p class="text-nas-purple-700">@{account.username}</p>
-            <div class="p-6 pt-0">
+            <div class="p-6 pt-4">
                 <form
                         method="POST"
                         action="?/authenticate&service={data.service}"
@@ -48,7 +48,7 @@
                     <input type="hidden" name="accountId" value={account.id} />
                     <button
                             type="submit"
-                            class="w-full text-sm font-semibold py-2 px-4 rounded-md bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="w-full text-sm font-semibold py-2 px-4 bg-nas-purple-600 hover:bg-nas-purple-700 text-nas-pink-50 disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={!canSelect}
                     >
                         {#if loadingAccountId === account.id}
