@@ -36,7 +36,7 @@
 	"dependencies": {
 		"@libsql/client": "^0.17.0",
 		"@nas-szpunar/colors": "^1.1.1",
-		"arktype": "^2.1.29",
+		"arktype": "^2.2.0",
 		"lucide-svelte": "^0.575.0"
 	}
 }
