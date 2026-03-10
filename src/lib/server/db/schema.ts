@@ -28,6 +28,18 @@ export const oidcAuthorizationCodes = sqliteTable('oidc_authorization_codes', {
 	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 });
 
+export const casServices = sqliteTable('cas_services', {
+	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+	name: text('name').notNull(),
+	serviceUrl: text('service_url').notNull().unique(),
+	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+});
+
+export const settings = sqliteTable('settings', {
+	key: text('key').primaryKey(),
+	value: text('value').notNull(),
+});
+
 export const casServiceTokens = sqliteTable('cas_service_tokens', {
 	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
 	service: text('service').notNull(),

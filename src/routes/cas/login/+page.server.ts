@@ -1,12 +1,22 @@
 import { db } from '$lib/server/db';
-import { accounts, casServiceTokens } from '$lib/server/db/schema';
+import { accounts, casServices, casServiceTokens } from '$lib/server/db/schema';
+import { isAllowAnyService } from '$lib/server/db/settings';
 import { error, redirect } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const service = url.searchParams.get('service');
 	if (!service) {
 		error(400, 'Missing service parameter');
+	}
+
+	const allowAny = await isAllowAnyService();
+	if (!allowAny) {
+		const registered = await db.select().from(casServices).where(eq(casServices.serviceUrl, service)).get();
+		if (!registered) {
+			error(400, 'Service URL is not registered');
+		}
 	}
 
 	const accountsList = await db.select().from(accounts);
@@ -18,6 +28,14 @@ export const actions: Actions = {
 		const service = url.searchParams.get('service');
 		if (!service) {
 			error(400, 'Missing service parameter');
+		}
+
+		const allowAny = await isAllowAnyService();
+		if (!allowAny) {
+			const registered = await db.select().from(casServices).where(eq(casServices.serviceUrl, service)).get();
+			if (!registered) {
+				error(400, 'Service URL is not registered');
+			}
 		}
 
 		const formData = await request.formData();

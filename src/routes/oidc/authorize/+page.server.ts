@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db';
 import { accounts, oidcAuthorizationCodes, oidcClients } from '$lib/server/db/schema';
+import { isAllowAnyService } from '$lib/server/db/settings';
 import { error, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
@@ -12,18 +13,43 @@ export const load: PageServerLoad = async ({ url }) => {
 	const state = url.searchParams.get('state');
 	const nonce = url.searchParams.get('nonce');
 
-	// Phase 1: validate client and redirect_uri before trusting redirect_uri
 	if (!clientId) {
 		error(400, 'Missing client_id parameter');
 	}
 
-	const client = await db.select().from(oidcClients).where(eq(oidcClients.clientId, clientId)).get();
-	if (!client) {
-		error(400, 'Unknown client_id');
-	}
-
 	if (!redirectUri) {
 		error(400, 'Missing redirect_uri parameter');
+	}
+
+	const allowAny = await isAllowAnyService();
+	const client = await db.select().from(oidcClients).where(eq(oidcClients.clientId, clientId)).get();
+
+	if (allowAny) {
+		// Accept any client; use registered name if available, otherwise fall back to clientId
+		const clientName = client?.name ?? clientId;
+
+		if (responseType !== 'code') {
+			error(400, 'Unsupported response_type (must be "code")');
+		}
+		if (!scope || !scope.split(' ').includes('openid')) {
+			error(400, 'scope must include "openid"');
+		}
+
+		const accountsList = await db.select().from(accounts);
+		return {
+			accounts: accountsList,
+			clientName,
+			clientId,
+			redirectUri,
+			scope,
+			state: state ?? '',
+			nonce: nonce ?? '',
+		};
+	}
+
+	// Strict mode: validate client and redirect_uri
+	if (!client) {
+		error(400, 'Unknown client_id');
 	}
 
 	const allowedUris: string[] = JSON.parse(client.redirectUris);
@@ -31,7 +57,6 @@ export const load: PageServerLoad = async ({ url }) => {
 		error(400, 'redirect_uri not registered for this client');
 	}
 
-	// Phase 2: validate remaining params
 	if (responseType !== 'code') {
 		error(400, 'Unsupported response_type (must be "code")');
 	}
@@ -67,15 +92,28 @@ export const actions: Actions = {
 			return { error: 'No account selected' };
 		}
 
-		// Re-validate client and redirect_uri
-		const client = await db.select().from(oidcClients).where(eq(oidcClients.clientId, clientId)).get();
-		if (!client) {
-			error(400, 'Unknown client_id');
-		}
+		const allowAny = await isAllowAnyService();
+		let client = await db.select().from(oidcClients).where(eq(oidcClients.clientId, clientId)).get();
 
-		const allowedUris: string[] = JSON.parse(client.redirectUris);
-		if (!allowedUris.includes(redirectUri)) {
-			error(400, 'redirect_uri not registered for this client');
+		if (allowAny) {
+			// Auto-insert client if it doesn't exist (to satisfy FK on authorization codes)
+			if (!client) {
+				await db.insert(oidcClients).values({
+					clientId,
+					clientSecret: crypto.randomUUID(),
+					name: `Auto: ${clientId}`,
+					redirectUris: JSON.stringify([redirectUri]),
+				});
+			}
+		} else {
+			if (!client) {
+				error(400, 'Unknown client_id');
+			}
+
+			const allowedUris: string[] = JSON.parse(client.redirectUris);
+			if (!allowedUris.includes(redirectUri)) {
+				error(400, 'redirect_uri not registered for this client');
+			}
 		}
 
 		// Validate granted scopes
