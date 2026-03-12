@@ -31,8 +31,15 @@ export const actions: Actions = {
 		}
 
 		const allowAny = await isAllowAnyService();
-		if (!allowAny) {
-			const registered = await db.select().from(casServices).where(eq(casServices.serviceUrl, service)).get();
+		const registered = await db.select().from(casServices).where(eq(casServices.serviceUrl, service)).get();
+		if (allowAny) {
+			if (!registered) {
+				await db.insert(casServices).values({
+					name: `Auto: ${service}`,
+					serviceUrl: service,
+				});
+			}
+		} else {
 			if (!registered) {
 				error(400, 'Service URL is not registered');
 			}

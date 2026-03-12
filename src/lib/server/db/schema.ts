@@ -42,7 +42,7 @@ export const settings = sqliteTable('settings', {
 
 export const casServiceTokens = sqliteTable('cas_service_tokens', {
 	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-	service: text('service').notNull(),
+	service: text('service').notNull().references(() => casServices.serviceUrl),
 	token: text('token').notNull(),
 	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 	isValid: integer('is_valid', { mode: 'boolean' }).notNull().default(true),

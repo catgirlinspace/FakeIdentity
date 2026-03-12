@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {enhance} from '$app/forms'
 	import {LoaderCircle} from 'lucide-svelte'
+	import Button from '$lib/components/Button.svelte'
 
 	let {data, form} = $props()
 	let canSelect = $state(true)
@@ -46,9 +47,9 @@
 						}}
                 >
                     <input type="hidden" name="accountId" value={account.id} />
-                    <button
+                    <Button
                             type="submit"
-                            class="w-full text-sm font-semibold py-2 px-4 bg-nas-purple-600 hover:bg-nas-purple-700 text-nas-pink-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="w-full text-sm font-semibold py-2 px-4"
                             disabled={!canSelect}
                     >
                         {#if loadingAccountId === account.id}
@@ -56,7 +57,7 @@
                         {:else}
                             Select
                         {/if}
-                    </button>
+                    </Button>
                 </form>
             </div>
         </div>
